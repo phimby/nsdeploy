@@ -1,0 +1,84 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "site_name": {
+            "defaultValue": "",
+            "type": "String"
+        },
+        "region": {
+            "defaultValue": "",
+            "type": "String",
+             "allowedValues": [
+                "West Europe",
+                "North Europe",
+                "Central US"
+                ]
+        }
+    },
+    "variables": {
+        "appserviceplan_name": "[concat(parameters('site_name'), 'asplanns')]",
+        "site_url": "[concat(parameters('site_name'), '.azurewebsites.net')]",
+        "site_scm_url": "[concat(parameters('site_name'), '.scm.azurewebsites.net')]",
+        "appinsights_name": "[concat(parameters('site_name'), 'appinsightns')]"
+    },
+    "resources": [
+        {
+            "comments": "Nightscout Application Service Plan created from NS creation script - as Free",
+            "type": "Microsoft.Web/serverfarms",
+            "sku": {
+                "name": "F1",
+                "tier": "Free",
+                "size": "F1",
+                "family": "F",
+                "capacity": 0
+            },
+            "name": "[variables('appserviceplan_name')]",
+            "apiVersion": "2015-08-01",
+            "location": "[parameters('region')]",
+            "properties": {
+                "name": "[variables('appserviceplan_name')]",
+                "numberOfWorkers": 0
+            },
+            "dependsOn": []
+        },
+        {
+            "comments": "Nightscout site created from NS creation script",
+            "type": "Microsoft.Web/sites",
+            "name": "[parameters('site_name')]",
+            "apiVersion": "2015-08-01",
+            "location": "[parameters('region')]",
+            "tags": {
+                
+            },
+            "properties": {
+                "name": "[parameters('site_name')]",
+                "hostNames": [
+                    "[variables('site_url')]"
+                ],
+                "enabledHostNames": [
+                    "[variables('site_url')]",
+                    "[variables('site_scm_url')]"
+                ],
+                "hostNameSslStates": [
+                    {
+                        "name": "[concat(parameters('site_name'),'newcgm.azurewebsites.net')]",
+                        "sslState": 0,
+                        "thumbprint": null,
+                        "ipBasedSslState": 0
+                    },
+                    {
+                        "name": "[concat(parameters('site_name'),'newcgm.scm.azurewebsites.net')]",
+                        "sslState": 0,
+                        "thumbprint": null,
+                        "ipBasedSslState": 0
+                    }
+                ],
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('appserviceplan_name'))]"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', variables('appserviceplan_name'))]"
+            ]
+        }
+    ]
+}
