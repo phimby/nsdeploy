@@ -62,13 +62,13 @@
                 ],
                 "hostNameSslStates": [
                     {
-                        "name": "[concat(parameters('site_name'),'newcgm.azurewebsites.net')]",
+                        "name": "[concat(parameters('site_name'),variables('site_url'))]",
                         "sslState": 0,
                         "thumbprint": null,
                         "ipBasedSslState": 0
                     },
                     {
-                        "name": "[concat(parameters('site_name'),'newcgm.scm.azurewebsites.net')]",
+                        "name": "[concat(parameters('site_name'),variables('site_scm_url'))]",
                         "sslState": 0,
                         "thumbprint": null,
                         "ipBasedSslState": 0
