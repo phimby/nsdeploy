@@ -8,12 +8,7 @@
         },
         "region": {
             "defaultValue": "",
-            "type": "String",
-             "allowedValues": [
-                "West Europe",
-                "North Europe",
-                "Central US"
-                ]
+            "type": "String"
         }
     },
     "variables": {
@@ -74,11 +69,27 @@
                         "ipBasedSslState": 0
                     }
                 ],
-                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('appserviceplan_name'))]"
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('appserviceplan_name'))]",
             },
+            "resources": [
+                {
+                "apiVersion": "2015-08-01",
+                "name": "web",
+                "type": "sourcecontrols",
+                "dependsOn": [
+                    "[resourceId('Microsoft.Web/Sites', parameters('site_name'))]"
+                ],
+                "properties": {
+                    "RepoUrl":"https://github.com/nightscout/cgm-remote-monitor.git",
+                    "branch":"master",
+                    "IsManualIntegration":true
+                }
+                }
+            ],
             "dependsOn": [
                 "[resourceId('Microsoft.Web/serverfarms', variables('appserviceplan_name'))]"
             ]
         }
+        
     ]
 }

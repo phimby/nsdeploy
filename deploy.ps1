@@ -14,8 +14,8 @@
  .PARAMETER resourceGroupLocation
     Optional, a resource group location. If specified, will try to create a new resource group in this location. If not specified, assumes resource group is existing.
 
- .PARAMETER deploymentName
-    The deployment name.
+ .PARAMETER websiteName
+    The name of the Azure Website to deploy to.
 
  .PARAMETER templateFilePath
     Optional, path to the template file. Defaults to template.json.
@@ -32,7 +32,7 @@ param(
 
  [Parameter(Mandatory=$True)]
  [string]
- $deploymentName,
+ $websiteName,
 
  [string]
  $templateFilePath = "nightscouttemplate.json",
@@ -60,23 +60,21 @@ Function RegisterRP {
 #******************************************************************************
 $ErrorActionPreference = "Stop"
 
+# Validate that the website name doesn't already exist.
+if (Test-AzureName -Website $websiteName) {
+    Write-Host "The website $websiteName already exists in Azure.  Please choose another name and try again."
+    exit
+}
+
 # sign in
 Write-Host "Logging in...";
-Login-AzureRmAccount;
+Login-AzureRmAccount
 
-# select subscription
-#Write-Host "Selecting subscription '$subscriptionId'";
-#Select-AzureRmSubscription -SubscriptionID $subscriptionId;
+# Get subscription
+(Get-AzureRmSubscription | Out-GridView -Title "Select the Azure subscription that you want to use ..." -PassThru) | Select-AzureRmSubscription
 
-$subscriptionId = (Get-AzureRmSubscription | Out-GridView -Title "Select the Azure subscription that you want to use ..." -PassThru).SubscriptionID
-
-# select subscription
-
-Write-Host "Selecting subscription '$subscriptionId'";
-Select-AzureRmSubscription -SubscriptionID $subscriptionId;
-
-$resourceGroupLocation = (Get-AzureRmLocation | Out-GridView -Title "Select the Azure location that you want to deploy to ..." -PassThru).DisplayName
-
+# Get location
+$resourceGroupLocation = (Get-AzureRmLocation | Select DisplayName | Out-GridView -Title "Select the Azure location that you want to deploy to ..." -PassThru).DisplayName
 
 # Register RPs
 $resourceProviders = @("microsoft.insights","microsoft.web");
@@ -104,8 +102,7 @@ else{
 
 # Start the deployment
 Write-Host "Starting deployment...";
-if(Test-Path $parametersFilePath) {
-    New-AzureRmResourceGroupDeployment -ResourceGroupName $resourceGroupName -TemplateFile $templateFilePath -TemplateParameterFile $parametersFilePath;
-} else {
-    New-AzureRmResourceGroupDeployment -ResourceGroupName $resourceGroupName -TemplateFile $templateFilePath;
-}
+Write-Host "NOTE: This will take a bit of time, and there is no indication of progress!";
+
+$params = @{site_name=$websiteName;region=$resourceGroupLocation}
+New-AzureRmResourceGroupDeployment -ResourceGroupName $resourceGroupName -TemplateParameterObject $params -TemplateFile $templateFilePath;
