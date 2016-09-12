@@ -26,13 +26,21 @@
 
 param(
 
- [Parameter(Mandatory=$True)]
- [string]
- $resourceGroupName,
+ #[Parameter(Mandatory=$True)]
+ #[string]
+ #$resourceGroupName,
 
  [Parameter(Mandatory=$True)]
  [string]
  $websiteName,
+
+  [Parameter(Mandatory=$True)]
+ [string]
+ $mongoConnString,
+  
+  [Parameter(Mandatory=$True)]
+ [string]
+ $APISecret,
 
  [string]
  $templateFilePath = "nightscouttemplate.json",
@@ -65,6 +73,9 @@ if (Test-AzureName -Website $websiteName) {
     Write-Host "The website $websiteName already exists in Azure.  Please choose another name and try again."
     exit
 }
+
+$resourceGroupName = $websiteName + "-NSResourceGrp"
+
 
 # sign in
 Write-Host "Logging in...";
@@ -104,5 +115,5 @@ else{
 Write-Host "Starting deployment...";
 Write-Host "NOTE: This will take a bit of time, and there is no indication of progress!";
 
-$params = @{site_name=$websiteName;region=$resourceGroupLocation}
+$params = @{site_name=$websiteName;region=$resourceGroupLocation;connectionString=$mongoConnString;aPISecret=$APISecret}
 New-AzureRmResourceGroupDeployment -ResourceGroupName $resourceGroupName -TemplateParameterObject $params -TemplateFile $templateFilePath;

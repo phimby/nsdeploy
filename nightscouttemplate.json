@@ -6,7 +6,15 @@
             "defaultValue": "",
             "type": "String"
         },
-        "region": {
+        "connectionString": {
+            "defaultValue": "",
+            "type": "String"
+        },
+        "aPISecret": {
+            "defaultValue": "",
+            "type": "String"
+        },
+                "region": {
             "defaultValue": "",
             "type": "String"
         }
@@ -35,7 +43,7 @@
                 "name": "[variables('appserviceplan_name')]",
                 "numberOfWorkers": 0
             },
-            "dependsOn": []
+            "dependsOn": [ ]
         },
         {
             "comments": "Nightscout site created from NS creation script",
@@ -44,7 +52,7 @@
             "apiVersion": "2015-08-01",
             "location": "[parameters('region')]",
             "tags": {
-                
+
             },
             "properties": {
                 "name": "[parameters('site_name')]",
@@ -55,6 +63,31 @@
                     "[variables('site_url')]",
                     "[variables('site_scm_url')]"
                 ],
+                       "siteConfig": {
+                            "appSettings": [
+                                {
+                                    "name": "ENABLE",
+                                    "value": "careportal rawbg maker"
+                                }
+                            ],
+                            "connectionStrings": [
+                                {
+                                    "connectionString": "[parameters('connectionString')]",
+                                    "name": "mongo",
+                                    "type": 3
+                                },
+                                {
+                                    "connectionString": "entries",
+                                    "name": "mongo_collection",
+                                    "type": 3
+                                },
+                                {
+                                    "connectionString": "[parameters('aPISecret')]",
+                                    "name": "API_SECRET",
+                                    "type": 3
+                                }
+                            ]
+                        },
                 "hostNameSslStates": [
                     {
                         "name": "[concat(parameters('site_name'),variables('site_url'))]",
@@ -71,25 +104,26 @@
                 ],
                 "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('appserviceplan_name'))]",
             },
+
             "resources": [
-                {
-                "apiVersion": "2015-08-01",
-                "name": "web",
-                "type": "sourcecontrols",
-                "dependsOn": [
-                    "[resourceId('Microsoft.Web/Sites', parameters('site_name'))]"
-                ],
-                "properties": {
-                    "RepoUrl":"https://github.com/nightscout/cgm-remote-monitor.git",
-                    "branch":"master",
-                    "IsManualIntegration":true
-                }
+                 {
+                    "apiVersion": "2015-08-01",
+                    "name": "web",
+                    "type": "sourcecontrols",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Web/Sites', parameters('site_name'))]"
+                    ],
+                    "properties": {
+                        "RepoUrl": "https://github.com/nightscout/cgm-remote-monitor.git",
+                        "branch": "master",
+                        "IsManualIntegration": true
+                    }
                 }
             ],
             "dependsOn": [
                 "[resourceId('Microsoft.Web/serverfarms', variables('appserviceplan_name'))]"
             ]
         }
-        
+
     ]
-}
+        }
