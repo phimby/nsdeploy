@@ -21,7 +21,8 @@ Website Name:
 Mongo connection string:
 API secret:
 
-Website name is whatever you want to call your site, for example if you wanted to call your site mrsmiths-nightscout you would type that in
+Website name is whatever you want to call your site, for example if you wanted to call your site mrsmiths-nightscout you would type "mrsmiths-nightscout".
+
 Your web address would then be https://mrsmiths-nightscout.azurewebsites.net
 
 Mongo connection string is the full connectionstring with username and password, as described in the nightscout set up instructions
