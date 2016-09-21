@@ -70,8 +70,14 @@ $ErrorActionPreference = "Stop"
 
 # Validate that the website name doesn't already exist.
 if (Test-AzureName -Website $websiteName) {
-    Write-Host "The website $websiteName already exists in Azure.  Please choose another name and try again."
-    exit
+    Write-Error "The website $websiteName already exists in Azure.  Please choose another name and try again."
+    
+}
+
+# Validate that the website name doesn't already exist.
+if ($APISecret.Length -lt 12) {
+    Write-Error "Your API Secret is less than 12 characters, please try with a longer one."
+    
 }
 
 $resourceGroupName = $websiteName + "-NSResourceGrp"
